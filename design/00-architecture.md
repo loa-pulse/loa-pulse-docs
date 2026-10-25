@@ -13,7 +13,7 @@
 | 4. 데이터 모델과 시계열 보관 정책 | **확정** · [02-data-model.md](02-data-model.md) |
 | 5. 장애 처리와 관측성 | **확정** · [03-operations.md](03-operations.md) |
 | 6. 테스트 전략 | **확정** · [04-testing.md](04-testing.md) |
-| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D24), 미결정 사항은 이 문서 끝 |
+| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D25), 미결정 사항은 이 문서 끝 |
 
 ## 기술 스택
 
