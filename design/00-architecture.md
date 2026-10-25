@@ -13,7 +13,7 @@
 | 4. 데이터 모델과 시계열 보관 정책 | **확정** · [02-data-model.md](02-data-model.md) |
 | 5. 장애 처리와 관측성 | **확정** · [03-operations.md](03-operations.md) |
 | 6. 테스트 전략 | **확정** · [04-testing.md](04-testing.md) |
-| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D25), 미결정 사항은 이 문서 끝 |
+| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D27), 미결정 사항은 이 문서 끝 |
 
 ## 기술 스택
 
@@ -184,4 +184,3 @@ com.loapulse.<모듈>
 | 모니터링·로그 도구 조합 (Prometheus, Grafana, Loki 등) | 배포 환경 확정 후 |
 | 리더 선출 방식 | 배포 환경 확정 후 |
 | docs를 어느 저장소에 둘지 | 저장소 생성 시 |
-| 수집 단위 (아이템 하나인지 검색 페이지 하나인지) | M0 사전 조사 |
