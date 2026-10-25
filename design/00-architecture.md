@@ -26,6 +26,7 @@
 | 브라우저 실시간 전달 | SSE (Server-Sent Events) |
 | API 문서 | springdoc (OpenAPI) |
 | 프론트엔드 | Vite, React, TypeScript, shadcn/ui, TanStack Query, lightweight-charts |
+| 프론트엔드 보조 도구 | pnpm, React Router, Tailwind CSS, ESLint, Prettier |
 | 프론트엔드 API 타입 | 백엔드 OpenAPI 문서에서 자동 생성 (`openapi-typescript` 등) |
 | 디스코드 연동 | 백엔드에서 디스코드 REST API로 직접 DM 발송 (상시 연결하는 봇 프로세스 없음) |
 | 배포 | 미정 |
