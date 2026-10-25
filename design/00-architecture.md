@@ -34,10 +34,18 @@
 
 ```
 ~/develop/loa-pulse/            일반 폴더 (git 저장소 아님)
-├── docs/                       기획, 설계 문서 (어느 저장소에 둘지 미정)
-├── loa-pulse-backend/          git 저장소
-└── loa-pulse-frontend/         git 저장소
+├── docs/                       loa-pulse-docs 저장소 (기획, 설계 문서)
+├── loa-pulse-backend/          loa-pulse-backend 저장소
+└── loa-pulse-frontend/         loa-pulse-frontend 저장소
 ```
+
+| 저장소 | 내용 |
+|---|---|
+| [loa-pulse-docs](https://github.com/loa-pulse/loa-pulse-docs) | 기획, 설계 문서 |
+| [loa-pulse-backend](https://github.com/loa-pulse/loa-pulse-backend) | 백엔드 |
+| [loa-pulse-frontend](https://github.com/loa-pulse/loa-pulse-frontend) | 프론트엔드 |
+
+브랜치 전략과 머지 방식은 [D25](decisions.md#d25-브랜치-전략은-github-flow로-하고-pr은-머지-커밋으로-합친다)를 따른다.
 
 ## 시스템 구성도
 
