@@ -63,3 +63,4 @@
 | [04-policies.md](04-policies.md) | 서비스 정책 |
 | [05-milestones.md](05-milestones.md) | 마일스톤, 성공 지표, 리스크 |
 | [06-reference-analysis.md](06-reference-analysis.md) | 참고 서비스 분석 |
+| [07-api-findings.md](07-api-findings.md) | Open API 조사 결과 |
