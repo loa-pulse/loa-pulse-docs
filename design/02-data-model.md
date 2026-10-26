@@ -41,8 +41,8 @@ price_snapshot (원본)       ──보관 3일──▶ 날짜별 파티션째 
 | 평균 거래가, 거래량 | 로스트아크 API 일별 통계 | COLD 판정, 급변동 오탐 방지 |
 
 - 거래량은 직접 계산할 수 없으므로 API에서 받는다.
-- API 일별 통계는 아이템마다 하루 1번이면 된다. collector가 수집 예산이 남을 때 낮은 우선순위로 가져온다 (하루 약 1,000회, 예산의 1% 미만).
-- API가 실제로 어떤 값을 주는지는 M0에서 확인한다.
+- API 일별 통계는 아이템마다 하루 1번이면 된다. collector가 수집 예산이 남을 때 낮은 우선순위로 가져온다 (하루 약 650회, 예산의 1% 미만).
+- 상세 조회는 최근 14일의 날짜별 평균가와 거래량을 준다. 같은 아이템이 거래 가능 횟수별로 여러 항목으로 오므로, **검색에서 받은 `TradeRemainCount`와 같은 항목만 쓴다** ([07-api-findings.md](../planning/07-api-findings.md#검색-결과와-상세-항목의-대응)).
 
 ### 파티션 관리
 
@@ -65,19 +65,20 @@ price_snapshot (원본)       ──보관 3일──▶ 날짜별 파티션째 
 
 ```
 collection_target
-  id, kind(PRICE | DAILY_STAT), unit_key, tier,
+  id, kind(PRICE | DAILY_STAT), unit_key(카테고리 코드 + 페이지 번호), tier,
   last_collected_at, next_due_at, consecutive_failures, paused_until
 collection_target_item
   target_id ─FK─▶ collection_target, item_id
 ```
 
 - `kind`로 일별 통계 수집도 같은 테이블과 같은 스케줄러로 관리한다. 일별 통계는 주기가 24시간이고 우선순위가 가장 낮은 대상이다.
-- `collection_target_item`은 수집 단위 하나에 아이템이 여러 개 들어갈 때를 위한 것이다 (M0에서 확정).
+- 수집 단위는 카테고리 검색 페이지 하나다 (D26). `collection_target_item`은 그 페이지에 든 아이템 `Id` 목록이고, 수집할 때 받은 목록과 다르면 그 카테고리의 페이지를 다시 만든다.
 
 ### market
 
 ```
-item            id(API 아이템 코드), name, category_code, grade, bundle_count, icon_url
+item            id(API 아이템 코드), name, category_code, grade, bundle_count,
+                trade_remain_count(NULL 가능), icon_url
 price_snapshot  item_id, collected_at, lowest_price
                 PK(item_id, collected_at), collected_at 기준 날짜별 파티션
 latest_price    item_id(PK), price, prev_price, price_changed_at, refreshed_at
@@ -86,7 +87,9 @@ daily_price     item_id, date, open, high, low, close, api_avg_price, trade_coun
 ```
 
 - `latest_price.refreshed_at`은 가격이 같아도 수집할 때마다 바뀌고(D11), `price_changed_at`은 가격이 바뀔 때만 바뀐다.
-- 가격 컬럼의 타입(정수인지 소수인지)은 M0에서 API 응답을 보고 정한다.
+- 아이템은 API의 `Id` 하나로 식별한다. `trade_remain_count`는 상세 조회에서 어느 항목을 쓸지 고르는 데만 쓴다.
+- 가격은 모두 `bundle_count`개 묶음 기준이다. 개당 가격으로 바꾸지 않고 그대로 저장한다.
+- 최저가에서 나온 값(`lowest_price`, `price`, `prev_price`, 시가·고가·저가·종가, 알림의 `threshold`)은 API가 정수로 주므로 `integer`, `api_avg_price`는 소수 첫째 자리까지 오므로 `numeric(12, 1)`로 한다.
 
 ### alert
 
