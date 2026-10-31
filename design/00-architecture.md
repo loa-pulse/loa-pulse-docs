@@ -13,7 +13,7 @@
 | 4. 데이터 모델과 시계열 보관 정책 | **확정** · [02-data-model.md](02-data-model.md) |
 | 5. 장애 처리와 관측성 | **확정** · [03-operations.md](03-operations.md) |
 | 6. 테스트 전략 | **확정** · [04-testing.md](04-testing.md) |
-| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D27), 미결정 사항은 이 문서 끝 |
+| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D28), 미결정 사항은 이 문서 끝 |
 
 ## 기술 스택
 
@@ -29,7 +29,7 @@
 | 프론트엔드 보조 도구 | pnpm, React Router, Tailwind CSS, ESLint, Prettier |
 | 프론트엔드 API 타입 | 백엔드 OpenAPI 문서에서 자동 생성 (`openapi-typescript` 등) |
 | 디스코드 연동 | 백엔드에서 디스코드 REST API로 직접 DM 발송 (상시 연결하는 봇 프로세스 없음) |
-| 배포 | 미정 |
+| 배포 | 프론트엔드 Vercel, 백엔드 홈서버(Cloudflare Tunnel), 도메인 Cloudflare ([D28](decisions.md#d28-프론트엔드는-vercel-백엔드는-홈서버에-배포하고-cloudflare-도메인의-서브도메인으로-나눈다)) |
 
 ## 저장소 구성
 
@@ -180,6 +180,7 @@ com.loapulse.<모듈>
 
 | 항목 | 결정 시점 |
 |---|---|
-| 배포 환경 (홈서버 k8s-lab 등) | 사용자 검토 중. Grafana 공개 대시보드 링크를 외부에서 접근할 경로가 필요하다 (D22) |
+| 홈서버 실행 형태 (k8s-lab, Docker Compose 등) | 사용자 검토 중. 공개 경로는 Cloudflare Tunnel로 정했다 (D28) |
+| 도메인 이름 | Cloudflare에서 구매 예정. 문서에는 `{도메인}`으로 적는다 (D28) |
 | 모니터링·로그 도구 조합 (Prometheus, Grafana, Loki 등) | 배포 환경 확정 후 |
 | 리더 선출 방식 | 배포 환경 확정 후 |
