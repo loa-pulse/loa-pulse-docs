@@ -13,7 +13,7 @@
 | 4. 데이터 모델과 시계열 보관 정책 | **확정** · [02-data-model.md](02-data-model.md) |
 | 5. 장애 처리와 관측성 | **확정** · [03-operations.md](03-operations.md) |
 | 6. 테스트 전략 | **확정** · [04-testing.md](04-testing.md) |
-| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D28), 미결정 사항은 이 문서 끝 |
+| 7. 기술 결정 기록과 미결정 사항 | [decisions.md](decisions.md) (D1~D31), 미결정 사항은 이 문서 끝 |
 
 ## 기술 스택
 
@@ -128,16 +128,56 @@
 
 ### 패키지 구조
 
+[D31](decisions.md#d31-모듈-안의-계층-의존-방향을-고정하고-jpa-엔티티-위치는-모듈의-ddd-적용-강도에-따라-정한다)
+
 모듈마다 같은 구조를 둔다.
 
 ```
 com.loapulse.<모듈>
  ├── api             다른 모듈이 볼 수 있는 유일한 패키지: 공개 API, 의존성 역전용 인터페이스, 이벤트
  ├── web             컨트롤러, 요청·응답 DTO
- ├── application     유스케이스 서비스, 이벤트 리스너
+ ├── application     유스케이스 서비스, 이벤트 리스너, 예약 작업, 다른 모듈의 api 인터페이스 구현
  ├── domain          애그리거트, 값 객체, 도메인 서비스, 내부 포트
- └── infrastructure  JPA 구현, 외부 API 클라이언트, Redis
+ └── infrastructure  내부 포트 구현: JPA, 외부 API 클라이언트, Redis. 외부 연결 설정
 ```
+
+#### 모듈 안의 의존 방향
+
+```
+web ──▶ application ──▶ domain ◀── infrastructure
+              │                    (domain의 포트를 구현)
+              └──▶ 자기 모듈의 api, 다른 모듈의 api
+```
+
+| 계층 | 참조할 수 있는 것 | 참조하면 안 되는 것 |
+|---|---|---|
+| `api` | shared | 자기 모듈의 다른 계층 전부. 다른 모듈에 보여주는 것이라 안쪽 타입이 새면 안 된다 |
+| `web` | application, domain, 자기 모듈의 api | infrastructure |
+| `application` | domain, 자기 모듈의 api, 다른 모듈의 api | web, infrastructure |
+| `domain` | shared | web, application, infrastructure, api |
+| `infrastructure` | domain | web, application |
+
+- 모든 계층은 shared를 참조할 수 있다.
+- `application`이 저장소나 외부 API를 쓸 때는 `domain`의 포트(인터페이스)를 통한다. 구현은 `infrastructure`에 두고 스프링이 주입한다.
+
+#### JPA 엔티티의 위치
+
+모듈의 DDD 적용 강도(아래 [모듈 구성](#모듈-구성))에 따라 다르다.
+
+| 모듈 | `domain` | 저장 |
+|---|---|---|
+| collector, alert (충실하게) | **순수 자바.** JPA, 스프링을 참조하지 않는다. 값 객체는 record로 둔다 | `domain`의 저장소 포트를 `infrastructure`가 구현한다. JPA 엔티티는 `infrastructure`에 따로 두고 도메인 객체와 매핑한다 |
+| market, user (가볍게) | JPA 엔티티가 곧 도메인 객체다. JPA와 Spring Data 저장소 인터페이스를 `domain`에 둔다 | Spring Data가 구현한다. 대량 저장(시세 원본 등)처럼 JPA가 맞지 않는 곳은 `infrastructure`에 JDBC 구현을 둔다 |
+| realtime, shared | 해당 없음 | 해당 없음 |
+
+#### 세부 위치
+
+| 대상 | 위치 | 예 |
+|---|---|---|
+| 예약 작업 (`@Scheduled`) | `application` | 수집 실행, 롤업, 파티션 관리 |
+| 다른 모듈의 api 인터페이스 구현 | `application` | market의 `MarketDataSink` 구현 |
+| 외부 연결 설정 (`@Configuration`) | `infrastructure` | 로스트아크 API `RestClient` |
+| `infrastructure`의 하위 패키지 | 외부 시스템이나 저장 기술별로 나눈다 | `infrastructure.lostark`, `infrastructure.persistence`, `infrastructure.redis`, `infrastructure.discord` |
 
 ## 모듈 간 통신 규칙
 

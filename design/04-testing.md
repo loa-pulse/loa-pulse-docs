@@ -42,6 +42,7 @@ DB나 스프링 없이 순수 자바로 테스트한다. 가장 많이, 가장 �
 ## 4. 아키텍처 테스트 (ArchUnit)
 
 [00-architecture.md](00-architecture.md)의 모듈 경계 규칙을 테스트로 검사한다 (D6).
+모듈 안의 계층 의존 방향과, collector·alert의 `domain`이 JPA와 스프링을 참조하지 않는지도 검사한다 (D31).
 테이블 접근은 ArchUnit이 잡지 못하므로 코드 리뷰로 지킨다 (D18).
 
 ## 5. 프론트엔드

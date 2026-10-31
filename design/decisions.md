@@ -481,3 +481,27 @@
   - **D22 그대로 (전부 Grafana 패널)**: 백엔드 작업은 없지만 Figma와 프론트엔드 계획을 다시 만들어야 하고, M1의 수집 요약 띠가 Grafana에 묶인다.
   - **현재 값 화면을 빼고 Grafana만**: 포트폴리오에서 보여주고 싶은 "신선도가 화면에 보이는 것"이 약해진다.
 - **감수한 점**: 평균 반영 지연을 collector와 Prometheus 두 곳에서 계산하므로 API 값과 Grafana 그래프의 값이 조금 다를 수 있다. 같은 측정값을 Micrometer 지표와 collector의 최근 1시간 집계에 함께 기록해 차이를 줄인다.
+
+## D31. 모듈 안의 계층 의존 방향을 고정하고, JPA 엔티티 위치는 모듈의 DDD 적용 강도에 따라 정한다
+
+- **날짜**: 2026-11-01
+- **배경**
+  - 모듈 안의 패키지 5개(`api`, `web`, `application`, `domain`, `infrastructure`)는 정했지만, 계층 사이에 누가 누구를 참조해도 되는지는 정하지 않았다. ArchUnit도 모듈 사이만 검사해서, 모듈 안에서 거꾸로 의존해도 테스트가 통과한다.
+  - JPA 엔티티를 어디에 둘지 정하지 않았다. collector와 alert는 "DDD 충실하게", market과 user는 "가볍게"로 정했는데(00-architecture 모듈 구성), 그 차이가 코드에서 무엇을 뜻하는지 비어 있었다. M1의 market 시세 저장부터 바로 부딪힌다.
+- **결정**
+  - **계층 의존 방향**: `web → application → domain ← infrastructure`. `application`은 자기 모듈과 다른 모듈의 `api`를 참조할 수 있다. `domain`은 다른 계층을 참조하지 않는다. `infrastructure`는 `domain`의 포트를 구현한다. 표는 [00-architecture.md](00-architecture.md#모듈-안의-의존-방향)를 따른다.
+  - **JPA 엔티티 위치**
+    - collector, alert: `domain`은 순수 자바다. JPA 엔티티는 `infrastructure`에 따로 두고 도메인 객체와 매핑한다.
+    - market, user: JPA 엔티티를 도메인 객체로 그대로 쓰고 `domain`에 둔다. Spring Data 저장소 인터페이스도 `domain`에 둔다.
+  - **세부 위치**: 예약 작업과 다른 모듈의 api 인터페이스 구현은 `application`, 외부 연결 설정은 `infrastructure`, `infrastructure`의 하위 패키지는 외부 시스템이나 저장 기술별로 나눈다.
+  - 계층 방향과 collector·alert `domain`의 JPA·스프링 금지를 ArchUnit으로 검사한다.
+- **이유**
+  - 이미 정한 DDD 적용 강도를 저장 방식에 그대로 옮긴 것이다. 도메인 복잡도에 맞춰 설계 비용을 다르게 들인다.
+  - collector와 alert의 핵심 규칙(원본 갱신 주기 추정, 호출 예산, 등급, 알림 상태 전이)은 불변 값 객체와 record로 표현하는 것이 자연스럽다. JPA 엔티티로 만들면 기본 생성자와 가변 필드를 열어야 한다. 순수 자바면 DB 없이 단위 테스트한다 ([04-testing.md](04-testing.md#1-도메인-단위-테스트)).
+  - collector와 alert는 테이블이 적어(collector 2개, alert 3개) 매핑 비용이 작다.
+  - market은 하루 약 50만 행을 쓰는 시계열 저장소다. 도메인 객체로 감싸도 얻는 것이 없고, 대량 저장은 JPA보다 JDBC 일괄 삽입이 맞을 수 있다.
+- **포기한 대안**
+  - **모든 모듈에서 분리**: 저장과 조회가 대부분인 market과 user에서 매핑 코드만 늘어난다.
+  - **모든 모듈에서 JPA 엔티티를 도메인으로**: 코드는 가장 적지만, 메인 기술 스토리(M4 수집 스케줄러)의 무대인 collector 도메인이 JPA 제약 안에서 만들어진다.
+- **감수한 점**: 모듈마다 저장 방식이 두 가지로 나뉜다. 문서와 ArchUnit 규칙으로 모듈별 규칙을 명시해 실수를 막는다.
+- **다시 검토할 조건**: market이나 user에 지켜야 할 규칙이 많아지면 그 모듈만 분리 방식으로 바꾼다. 모듈 경계가 `api`로 막혀 있어 다른 모듈에는 영향이 없다.
