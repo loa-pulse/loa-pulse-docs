@@ -21,6 +21,8 @@
 | [04-policies.md](planning/04-policies.md) | 서비스 정책 |
 | [05-milestones.md](planning/05-milestones.md) | 마일스톤, 성공 지표, 리스크 |
 | [06-reference-analysis.md](planning/06-reference-analysis.md) | 참고 서비스 분석 |
+| [07-api-findings.md](planning/07-api-findings.md) | Open API 조사 결과 |
+| [08-frontend-plan.md](planning/08-frontend-plan.md) | 프론트엔드 작업 계획 |
 
 ## 설계 (`design/`)
 
