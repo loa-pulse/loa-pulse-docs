@@ -33,6 +33,7 @@
 | [02-data-model.md](design/02-data-model.md) | 데이터 모델과 시계열 보관 정책 |
 | [03-operations.md](design/03-operations.md) | 장애 처리와 관측성 |
 | [04-testing.md](design/04-testing.md) | 테스트 전략 |
+| [05-api.md](design/05-api.md) | API 설계 (공통 규칙, 엔드포인트 지도, SSE) |
 | [decisions.md](design/decisions.md) | 기술 결정 기록 |
 
 ### 모듈 (`design/modules/`)
