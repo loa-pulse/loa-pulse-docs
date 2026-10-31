@@ -37,11 +37,11 @@
 - 로그인은 세션 쿠키로 한다. 쿠키 도메인 `.{도메인}`, `SameSite=Lax`, `Secure`, `HttpOnly` (D28).
 - 로그인이 필요한 API를 로그인 없이 부르면 `401`을 돌려준다. 프론트엔드는 `401`이면 로그인 안내를 띄운다.
 
-### CSRF (제안)
+### CSRF
 
 - `POST`, `PATCH`, `PUT`, `DELETE` 요청은 CSRF 토큰이 필요하다.
 - 백엔드는 토큰을 `XSRF-TOKEN` 쿠키(도메인 `.{도메인}`, JavaScript에서 읽을 수 있음)로 내려주고, 프론트엔드는 같은 값을 `X-XSRF-TOKEN` 헤더로 보낸다. Spring Security의 `CookieCsrfTokenRepository` 기본 방식이다.
-- 프론트엔드 3-6 전에 확정한다.
+- 2026-11-01에 이 방식으로 확정했다 ([08-frontend-plan.md](../planning/08-frontend-plan.md#기술)).
 
 ### 형식
 
@@ -418,4 +418,3 @@ Accept: text/event-stream
 | 급변동 알림 "하루 최대 5번" | Figma 설정 화면의 문구다. [기획 4.3](../planning/04-policies.md#43-급변동-알림-f11-p1)에는 아이템별 1시간 쿨다운만 있다 | M5 전 |
 | 받은 알림 내역(F10)의 마일스톤 | 프론트엔드 계획은 M3(3-13), 마일스톤 문서는 M5다 | M3 전 |
 | 기타 탭의 범위 | 모험의 서, 펫, 탈것 등을 기타 하나로 묶을지, 수집 범위에서 뺄지 | M1 수집 대상 관리 전 |
-| CSRF 토큰 전달 방식 | 위의 제안(쿠키 + 헤더)으로 확정할지 | 프론트엔드 3-6 전 |
