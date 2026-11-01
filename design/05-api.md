@@ -321,15 +321,16 @@ OpenAPI가 나오기 전까지 프론트엔드 목업(1-3)의 기준이다. 아�
 ## M2 이후 응답의 필드 (요약)
 
 해당 마일스톤을 시작할 때 위와 같은 형식으로 상세를 채운다.
+아이템을 썸네일로 보여주는 응답은 아이콘 테두리 색을 위해 아이템 등급(`grade`)을 함께 준다.
 
 | 엔드포인트 | 필드 (화면 기준) |
 |---|---|
-| `GET /api/rankings` | `rising[]`, `falling[]`: 순위, 아이템(ID, 이름, 카테고리 이름, 아이콘), 현재가, 1시간 변동률. `calculatedAt` |
+| `GET /api/rankings` | `rising[]`, `falling[]`: 순위, 아이템(ID, 이름, 등급, 카테고리 이름, 아이콘), 현재가, 1시간 변동률. `calculatedAt` |
 | `GET /api/me` | 디스코드 ID, 닉네임, 아바타 URL, 가입일, 서버 참여 여부, DM 수신 상태(`UNKNOWN`, `OK`, `LEFT_GUILD`, `DM_BLOCKED`), 마지막 테스트 DM 시각, 급변동 구독 여부, 활성 알림 수와 한도(20) |
-| `GET /api/alerts` | `items[]`: 알림 ID, 아이템(ID, 이름, 아이콘, 현재가), 조건(`BELOW` / `ABOVE`), 기준가, 받을 곳(`dm`, `web`), 상태(`ACTIVE`, `PAUSED`, `TRIGGERED`), 발송 시각. `counts`: 전체, 상태별 개수. `activeLimit`: 20 |
+| `GET /api/alerts` | `items[]`: 알림 ID, 아이템(ID, 이름, 등급, 아이콘, 현재가), 조건(`BELOW` / `ABOVE`), 기준가, 받을 곳(`dm`, `web`), 상태(`ACTIVE`, `PAUSED`, `TRIGGERED`), 발송 시각. `counts`: 전체, 상태별 개수. `activeLimit`: 20 |
 | `POST /api/alerts` | 요청: 아이템 ID, 조건, 기준가, 받을 곳. 활성 알림이 20개면 `409 ALERT_LIMIT_EXCEEDED`, 받을 곳이 하나도 없으면 `400` |
-| `GET /api/notifications` | 알림 ID, 아이템(ID, 이름, 아이콘), 발송 당시 가격, 조건과 기준가, 채널별 결과(DM 성공 / DM 실패 / 웹), 시각. 최근 30일 |
-| `GET /api/me/watch-items` | 아이템(ID, 이름, 카테고리 이름, 아이콘), 현재가, 전일 대비, 오늘 추이(시간별 최저가 점) |
+| `GET /api/notifications` | 알림 ID, 아이템(ID, 이름, 등급, 아이콘), 발송 당시 가격, 조건과 기준가, 채널별 결과(DM 성공 / DM 실패 / 웹), 시각. 최근 30일 |
+| `GET /api/me/watch-items` | 아이템(ID, 이름, 등급, 카테고리 이름, 아이콘), 현재가, 전일 대비, 오늘 추이(시간별 최저가 점) |
 | `GET /api/status` | 서비스 상태, 갱신 시각, 등급별(`HOT`, `NORMAL`, `COLD`) 아이템 수·수집 주기·평균 반영 지연, 최근 30일 장애(제목, 시작 시각, 지속 시간, 설명, 해결 여부) |
 
 ## SSE
